@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>書法生成器排版</title>
+    
+    <link rel="stylesheet" type="text/css" href="./Bootstrap/4.6.2/css/bootstrap.min.css" /> 
+    <script type="text/javascript" src="./JQuery/3.7.1/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="./Bootstrap/4.6.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="./Bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
+    <script type='text/javascript' src="./JQuery.validate/1.19.5/jquery.validate.min.js"></script> 
+    <script type="text/javascript" src="./js/Util.js"></script>
+    <script type="text/javascript" src="./js/Resource.js"></script>
+    <script type="text/javascript" src="./js/HomeJs.js"></script>
+    <style>
+        body {
+            background: linear-gradient(to bottom, #d2e4f5, #c4e5b5);
+            padding: 20px;
+        }
+        .card {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+        }
+        .preview-area {
+            background: #fff;
+            border: 1px solid #ddd;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        } 
+        .preview-img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .btn-block {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<script type='text/javascript'>
+$(document).ready(function(){
+	_initPage();
+})
+function _initPage() {
+     HomeJs._initPage();
+}
+
+</script>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- 左側輸入區 -->
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="row">
+                    <div class="col-12 d-flex justify-content-center">
+                        <h5>本文</h5>
+                    </div>                    
+                </div>                
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            <label>輸入佈局文字</label>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-12 d-flex justify-content-center">
+                            <input type="button" class="btn btn-sm btn-primary" value="唐詩三百首" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#addModalCenter" >
+                        </div>                    
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <textarea class="form-control" rows="4" id="content">依圖中文字樣</textarea>
+                        </div>
+                        
+                    </div>
+                    <div class="row" hidden id="imageHideDiv">
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            <label>選擇規格</label>
+                        </div>                    
+                    </div>
+                    <div class="row mb-1">
+                        <div class="col-12 d-flex justify-content-center">
+                           <select class="form-control" style="text-align: center;" name="bodyFont" id="bodyFont">
+                                <option value="楷書">楷書</option>
+                                <option value="標草書">標草書</option>
+                                <option value="篆書">篆書</option>
+                                <option value="草書">草書</option>
+                                <option value="行書">行書</option>
+                                <option value="隸書">隸書</option>
+                            </select>
+                        </div>                    
+                    </div>
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" name="fixWordHeight" id="fixWordHeight" value="Y" class="form-check-input">
+                                <label class="form-check-label">固定間距</label>
+                            </div>
+                           
+                        </div>                    
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            <label>選擇畫布尺寸</label>
+                        </div>                    
+                    </div>
+                    <div class="row mb-1">
+                        <div class="col-12 d-flex justify-content-center">
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="size" value="B1" class="form-check-input" checked>
+                                <label class="form-check-label">全開</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="size" value="B2" class="form-check-input">
+                                <label class="form-check-label">對開</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="size" value="SQ" class="form-check-input">
+                                <label class="form-check-label">斗方</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="size" value="CU" class="form-check-input">
+                                <label class="form-check-label">自訂</label>
+                            </div>
+                        </div>                    
+                    </div>
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            <div class="form-check-inline">
+                                <input type="text" disabled="disabled" onkeypress="return event.charCode >= 48 && event.charCode <= 57" class="form-control" placeholder="畫布寬度(公厘)" name="formWeight" id="formWeight"> 
+                                <input type="text" disabled="disabled" onkeypress="return event.charCode >= 48 && event.charCode <= 57" class="form-control" placeholder="畫布高度(公厘)" name="formHeight" id="formHeight"> 
+
+                            </div> 
+                        </div>                    
+                    </div>                    
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12 d-flex justify-content-center">
+                        <h5>落款</h5>
+                    </div>                    
+                </div>
+                
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            <label>落款字體規格</label>
+                        </div>                    
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-12 d-flex justify-content-center">
+                            <select class="form-control" style="text-align: center;" name="userFont" id="userFont">
+                                <option value="楷書">楷書</option>
+                                <option value="標草書">標草書</option>
+                                <option value="篆書">篆書</option>
+                                <option value="草書">草書</option>
+                                <option value="行書">行書</option>
+                                <option value="隸書">隸書</option>
+                            </select>
+                        </div>                    
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            <label>輸入落款文字</label>
+                        </div>                    
+                    </div>
+                    
+                    <textarea class="form-control" placeholder="輸入落款文字" rows="2" id="subject"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-12 d-flex justify-content-around">
+                        <input type="button" class="btn btn-sm btn-primary" value="加入落款" id="btnAddSubject">
+                        <input type="button" class="btn btn-sm btn-secondary" value="修改落款" id="btnEditSubject" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#subjectModalCenter">
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- 中間功能按鈕區 -->
+        <div class="col-md-2 mb-3">
+            <input type="button" class="btn btn-light btn-block" id="btnDrawImage" value="開始本文佈局">
+            <input type="button" class="btn btn-light btn-block" id="btnAddSpace" value="本文上下字距加寬">
+            <input type="button" class="btn btn-light btn-block" id="btnMinusSpace" value="本文上下字距變窄">
+            <input type="button" class="btn btn-light btn-block" id="btnAddRowSpace" value="本文行距加寬">
+            <input type="button" class="btn btn-light btn-block" id="btnMinusRowSpace" value="本文行距變窄">
+            <input type="button" class="btn btn-light btn-block" id="btnPositionChange" value="修改本文位置" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#contentModalCenter">
+            <input type="button" class="btn btn-light btn-block" id="btnAddOne" value="新開一張">
+            <input type="button" class="btn btn-light btn-block" id="btnPrev" value="前一張">
+            <input type="button" class="btn btn-light btn-block" id="btnNext" value="下一張">
+            <input type="button" class="btn btn-light btn-block" id="btnSavePicture" value="儲存圖片">
+            <input type="button" class="btn btn-light btn-block" value="生成動畫">
+            <input type="button" class="btn btn-light btn-block" hidden value="結束程式">
+        </div>
+
+        <!-- 右側預覽區 -->
+        <div class="col-md-6 mb-3">
+            <div>
+                <canvas id="previewCanvas" class="preview-area" height="1040px" width="760px" ></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="addModalCenter" style="overflow: auto" tabindex="-1" role="dialog" aria-labelledby="addModalCenterTitle" aria-hidden="true">
+  	<div class="modal-dialog modal-dialog-top modal-sm modal-xl" role="document" >
+    	<div class="modal-content">
+      		<div class="modal-header row" style="height:60px;">
+				<div class="col-1 col-lg form-inline">
+				</div>
+				<div class="col col-lg" style="align-content: center;">
+					<h6 class="modal-title text-center" id="addModalCenterTitle">唐詩三百首</h6>
+				</div>
+				<div class="col-1 col-lg">
+					<button type="button" class="close" data-dismiss="modal" style="padding-right: 15px;padding-left: 15px;" aria-label="Close">
+          				<span aria-hidden="true">&times;</span>
+        			</button>
+				</div>
+        		
+        		
+      		</div>
+      		<div class="modal-body">
+        		<form id="addModal">				    
+				   	<div class="row">
+				   		<div class="col-md-2 col-lg-2 d-none d-md-block textRightCenter">
+				        	<label class="col-form-label">詩體</label>
+				        </div>
+				        <div class="col-12 col-md-10 col-lg-10">
+				        	<select class="form-control" name="poeticStyle" style="text-align: center;" required id="poeticStyle">
+                                <option value="">請選擇詩體類型</option>
+                                <option value="七言古詩">七言古詩</option>
+                                <option value="七言律詩">七言律詩</option>
+                                <option value="七言絕句">七言絕句</option>
+                                <option value="七言古詩">五言古詩</option>
+                                <option value="五言律詩">五言律詩</option>
+                                <option value="五言絕句">五言絕句</option>
+                                <option value="樂府">樂府</option>
+							</select>
+				   		</div>
+				   	</div>
+                    <div class="row mt-2">
+				   		<div class="col-md-2 col-lg-2 d-none d-md-block textRightCenter">
+				        	<label class="col-form-label">詩文</label>
+				        </div>
+				        <div class="col-12 col-md-10 col-lg-10">
+				        	<select class="form-control" name="poetry" style="text-align: center;" required id="poetry">
+                                <option value="">請選擇詩文</option>
+							</select>
+				   		</div>
+				   	</div>				   
+        		</form>
+                
+  			</div>
+      		<div class="modal-footer">
+        		<input type="button" class="btn btn-secondary" data-dismiss="modal" value="關閉">
+        		<input type="button" class="btn btn-primary" name="btnAdd2" id="btnAdd2" value="確定">
+      		</div>
+    	</div>
+  	</div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="contentModalCenter" style="overflow: auto" tabindex="-1" role="dialog" aria-labelledby="contentModalCenterTitle" aria-hidden="true">
+  	<div class="modal-dialog modal-dialog-centered modal-sm modal-xl" role="document" >
+    	<div class="modal-content" style="background: linear-gradient(to bottom, #d2e4f5, #c4e5b5);">
+      		<div class="modal-header row" style="height:60px;">
+				<div class="col-1 col-lg form-inline">
+				</div>
+				<div class="col col-lg" style="align-content: center;">
+					<h6 class="modal-title text-center" id="contentModalCenterTitle">本文位置</h6>
+				</div>
+				<div class="col-1 col-lg">
+					<button type="button" class="close" data-dismiss="modal" style="padding-right: 15px;padding-left: 15px;" aria-label="Close">
+          				<span aria-hidden="true">&times;</span>
+        			</button>
+				</div>
+        		
+        		
+      		</div>
+      		<div class="modal-body">
+        		<form id="contentModal">				    
+				   	<div class="row">
+                        <!-- 左側預覽區 -->
+                        <div class="col-md-6 mb-3">
+                            <div class="row">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <canvas id="previewCanvas2" class="preview-area" style="max-width: 50%;" height="1040px" width="760px" ></canvas>
+                                </div>                               
+                            </div>
+                        </div>
+                        <!-- 右側 -->
+                        <div class="col-md-6 mb-3">
+                            <div class="row">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <label>移動方式</label>
+                                </div> 
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" name="moveType" value="ALL" class="form-check-input" checked>
+                                        <label class="form-check-label">全體</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" name="moveType" value="ONE" class="form-check-input">
+                                        <label class="form-check-label">個別</label>
+                                    </div>                                    
+                                </div>                    
+                            </div>
+                            <div class="row  mb-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <select class="form-select" name="targetWord" style="text-align: center;" id="targetWord">
+                                    </select>                                 
+                                </div>                    
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <img src="" id="imgTargetWord" style="width: 60px;">                                    
+                                </div>                    
+                            </div>                              
+                            <div class="row">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <img src="./img/dict_up.png" id="btnPositionUp" style="width: 60px;">
+                                </div> 
+                            </div>
+                            <div class="row">
+                                <div class="col-6 d-flex justify-content-center">
+                                    <img src="./img/dict_left.png" id="btnPositionLeft" style="width: 60px;">
+                                </div>
+                                <div class="col-6 d-flex justify-content-center">
+                                    <img src="./img/dict_right.png" id="btnPositionRight" style="width: 60px;">
+                                </div> 
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <img src="./img/dict_dwn.png" id="btnPositionDown" style="width: 60px;">
+                                </div> 
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <input type="number" min="1" value="15" id="intPositionWidth" onkeypress="return event.charCode >= 48 && event.charCode <= 57" class="form-control">
+                                </div> 
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-6 d-flex justify-content-end">
+                                    <img src="./img/big.png" id="btnWordWidthAdd" style="width: 60px;">
+                                </div>
+                                <div class="col-6 d-flex justify-content-start">
+                                    <img src="./img/small.png" id="btnWordWidthMinus" style="width: 60px;">
+                                </div> 
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <input type="number" min="1" value="5" id="intWordWidth" onkeypress="return event.charCode >= 48 && event.charCode <= 57" class="form-control">
+                                </div> 
+                            </div>
+                        </div>				   		
+				   	</div>                   				   
+        		</form>
+                
+  			</div>
+      		<div class="modal-footer">
+        		 <img src="./img/no.jpg" id="btnCloseContentConfig" style="width: 60px;">
+        		 <img src="./img/yes.jpg" id="btnSaveContentConfig" style="width: 60px;">
+      		</div>
+    	</div>
+  	</div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="subjectModalCenter" style="overflow: auto" tabindex="-1" role="dialog" aria-labelledby="subjectModalCenterTitle" aria-hidden="true">
+  	<div class="modal-dialog modal-dialog-centered modal-sm modal-xl" role="document" >
+    	<div class="modal-content" style="background: linear-gradient(to bottom, #d2e4f5, #c4e5b5);">
+      		<div class="modal-header row" style="height:60px;">
+				<div class="col-1 col-lg form-inline">
+				</div>
+				<div class="col col-lg" style="align-content: center;">
+					<h6 class="modal-title text-center" id="subjectModalCenterTitle">落款位置</h6>
+				</div>
+				<div class="col-1 col-lg">
+					<button type="button" class="close" data-dismiss="modal" style="padding-right: 15px;padding-left: 15px;" aria-label="Close">
+          				<span aria-hidden="true">&times;</span>
+        			</button>
+				</div>
+        		
+        		
+      		</div>
+      		<div class="modal-body">
+        		<form id="subjectModal">				    
+				   	<div class="row">
+                        <!-- 左側預覽區 -->
+                        <div class="col-md-6 mb-3">
+                            <div class="row">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <canvas id="previewCanvas3" class="preview-area" style="max-width: 50%;" height="1040px" width="760px" ></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 右側 -->
+                        <div class="col-md-6 mb-3">
+                            <div class="row">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <label>移動方式</label>
+                                </div> 
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" name="moveType" value="ALL" class="form-check-input" checked>
+                                        <label class="form-check-label">全體</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" name="moveType" value="ONE" class="form-check-input">
+                                        <label class="form-check-label">個別</label>
+                                    </div>                                    
+                                </div>                    
+                            </div>
+                            <div class="row  mb-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <select class="form-select" name="targetSubWord" style="text-align: center;" id="targetSubWord">
+                                    </select>                                 
+                                </div>                    
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <img src="" id="imgTargetSubWord" style="width: 60px;">                                    
+                                </div>                    
+                            </div>                            
+                            <div class="row">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <img src="./img/dict_up.png" id="btnSubPositionUp" style="width: 60px;">
+                                </div> 
+                            </div>
+                            <div class="row">
+                                <div class="col-6 d-flex justify-content-center">
+                                    <img src="./img/dict_left.png" id="btnSubPositionLeft" style="width: 60px;">
+                                </div>
+                                <div class="col-6 d-flex justify-content-center">
+                                    <img src="./img/dict_right.png" id="btnSubPositionRight" style="width: 60px;">
+                                </div> 
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <img src="./img/dict_dwn.png" id="btnSubPositionDown" style="width: 60px;">
+                                </div> 
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <input type="number" min="1" value="15" id="intSubPositionWidth" onkeypress="return event.charCode >= 48 && event.charCode <= 57" class="form-control">
+                                </div> 
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-6 d-flex justify-content-end">
+                                    <img src="./img/big.png" id="btnSubWordWidthAdd" style="width: 60px;">
+                                </div>
+                                <div class="col-6 d-flex justify-content-start">
+                                    <img src="./img/small.png" id="btnSubWordWidthMinus" style="width: 60px;">
+                                </div> 
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <input type="number" min="1" value="5" id="intSubWordWidth" onkeypress="return event.charCode >= 48 && event.charCode <= 57" class="form-control">
+                                </div> 
+                            </div>
+                        </div>				   		
+				   	</div>                   				   
+        		</form>
+                
+  			</div>
+      		<div class="modal-footer">
+        		<img src="./img/no.jpg" id="btnCloseSubjectConfig" style="width: 60px;">
+        		<img src="./img/yes.jpg" id="btnSaveSubjectConfig" style="width: 60px;">
+      		</div>
+    	</div>
+  	</div>
+</div>
+</body>
+</html>
+
