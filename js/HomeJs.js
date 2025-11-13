@@ -1105,7 +1105,8 @@ var HomeJs = HomeJs || {
     		wordsInLine = 7;
     		
     	}else if(totalWordCnt > 28 && totalWordCnt <= 50){
-    		wordsInLine = 10;
+    		line = 5;
+    		wordsInLine = Math.ceil(totalWordCnt/line);
     	}else{//>50
     		line = 8;
     		wordsInLine = Math.ceil(totalWordCnt/line);
@@ -1116,7 +1117,7 @@ var HomeJs = HomeJs || {
 		HomeJs.wordWidth = finalLength;
 		HomeJs.wordHeight = finalLength;
 		HomeJs.betweenWordHeight = finalLength + 20;
-		HomeJs.betweenWordWidth = finalLength + 30;
+		HomeJs.betweenWordWidth = finalLength + 10;
 		
 
         HomeJs.firstPositionX = HomeJs.intCanvasWidth - 3 * HomeJs.wordWidth/2;
