@@ -33,7 +33,7 @@ var HomeJs = HomeJs || {
     firstPositionX:0,
     firstPositionY:0,
     subPositionX:0,
-    subPositionX:0,
+    subPositionY:0,
     tmpPositionX:0,
     tmpPositionY:0,
     tmpBetweenWordHeight:80,
@@ -837,8 +837,8 @@ var HomeJs = HomeJs || {
         HomeJs.intCanvasWidth = parseInt(sWidth);
         HomeJs.firstPositionX = sWidth - 3 * HomeJs.wordWidth/2;
         HomeJs.firstPositionY = HomeJs.wordHeight/2;
-        HomeJs.subPositionX = 1 * HomeJs.wordWidth/2;
-        HomeJs.subPositionY = HomeJs.intCanvasHeight/3;
+        HomeJs.subPositionX = Math.floor(1 * HomeJs.wordWidth/2);
+        HomeJs.subPositionY = Math.floor(HomeJs.intCanvasHeight/3);
         //HomeJs.betweenWordHeight =  HomeJs.wordHeight,
         //HomeJs.betweenWordWidth = HomeJs.wordWidth,
         $("#formWeight").val(sWidth);
@@ -912,7 +912,7 @@ var HomeJs = HomeJs || {
 		//console.log("imageDom.height:"+imageDom.height);
         //console.log("imageDom.rate:"+rate);
 		var ctx = canvas.getContext('2d');
-        var oriHeight = rate * width;
+        var oriHeight = Math.floor(rate * width);
         
         if(fixedSpace){
             
@@ -1083,6 +1083,44 @@ var HomeJs = HomeJs || {
         HomeJs.loadInfo();       
         HomeJs.currentIndex = HomeJs.targetList.length - 1;
         HomeJs.refreshIconStatus();
+    },calWordWidth:function(totalWordCnt){
+    	if(totalWordCnt==0){
+    		HomeJs.wordWidth = 60;
+    		HomeJs.wordHeight = 60;
+    		HomeJs.betweenWordHeight = 80;
+    		HomeJs.betweenWordWidth = 90;
+    		HomeJs.firstPositionX = HomeJs.intCanvasWidth - 3 * HomeJs.wordWidth/2;
+            HomeJs.firstPositionY = HomeJs.wordHeight/2;
+    		return;
+    	}
+    	//HomeJs.wordWidth;
+    	//HomeJs.Height;
+    	var line = 4;
+    	var canvasWidth = HomeJs.intCanvasWidth;
+    	var canvasHeight = HomeJs.intCanvasHeight;
+    	var wordsInLine = 5;
+    	if(totalWordCnt <= 20){
+    		
+    	}else if(totalWordCnt > 20 && totalWordCnt <= 28){
+    		wordsInLine = 7;
+    		
+    	}else if(totalWordCnt > 28 && totalWordCnt <= 50){
+    		wordsInLine = 10;
+    	}else{//>50
+    		line = 8;
+    		wordsInLine = Math.ceil(totalWordCnt/line);
+    	}
+    	var avgWordWidth = Math.floor(canvasWidth*0.8/wordsInLine);
+		var avgWordHeight = Math.floor(canvasHeight/wordsInLine);
+		var finalLength = Math.min(avgWordWidth,avgWordHeight);
+		HomeJs.wordWidth = finalLength;
+		HomeJs.wordHeight = finalLength;
+		HomeJs.betweenWordHeight = finalLength + 20;
+		HomeJs.betweenWordWidth = finalLength + 30;
+		
+
+        HomeJs.firstPositionX = HomeJs.intCanvasWidth - 3 * HomeJs.wordWidth/2;
+        HomeJs.firstPositionY = HomeJs.wordHeight/2;
     },btnDrawImageEvent:function(e){
         var oriContent = $("#content").val();
         
@@ -1090,7 +1128,9 @@ var HomeJs = HomeJs || {
        
         var wordList = [];
         var itemCnt = content.length;
+        
         HomeJs.clearImageDiv(HomeJs.canvasId);
+        HomeJs.calWordWidth(itemCnt);
         //HomeJs.clearImageDiv(HomeJs.canvasId2);
         if(itemCnt>0){
             $("#btnAddSpace").removeAttr("disabled");
