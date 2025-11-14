@@ -167,7 +167,7 @@ var HomeJs = HomeJs || {
         selector = "#btnDrawImage";
 	        
         $(selector).unbind("click");
-        $(selector).on('click',HomeJs.btnDrawImageEvent);
+        $(selector).on('click',HomeJs.startDrawImageEvent);
 
         selector = "#btnPrev";
 	        
@@ -869,15 +869,24 @@ var HomeJs = HomeJs || {
         //     return;
         // }
         var imgDom = document.createElement('img');
+        var id = wordMap['index'];
+        if(wordMap['type'] == "C"){
+        	imgDom.setAttribute("id","word"+id);
+        }else{
+        	imgDom.setAttribute("id","subWord"+id);
+        }
+        
         $("#imageHideDiv")[0].append(imgDom);
         //imgDom.attr("style",'width:40px;height:40px');
         if(fontName != " "){
-            $(imgDom).attr("src","./font_data/"+fontType+"/"+fontName+".png").on('load',function(){
-                HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
-            });
-        }else{
-            HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
+            $(imgDom).attr("src","./font_data/"+fontType+"/"+fontName+".png");
+//            .on('load',function(){
+//                HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
+//            });
         }
+//        else{
+//            HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
+//        }
 	  	
         
         
@@ -943,7 +952,7 @@ var HomeJs = HomeJs || {
                     wordMap['height'] = oriHeight;
                 }
             }
-            //console.log(wordMap['word']+".height:"+oriHeight+",index:"+indexI+",wordCnt:"+wordCnt);
+            console.log(wordMap['word']+".height:"+oriHeight+",index:"+indexI+",wordCnt:"+wordCnt);
             if(indexI+1 < wordCnt && indexI >=0){
                 var diff = betweenWordHeight-wordHeight;
                 if(diff <= 20){
@@ -1111,7 +1120,13 @@ var HomeJs = HomeJs || {
     		line = 8;
     		wordsInLine = Math.ceil(totalWordCnt/line);
     	}
-    	var avgWordWidth = Math.floor(canvasWidth*0.8/wordsInLine);
+    	
+    	var minX = HomeJs.subPositionX + HomeJs.subWordWidth + 10;
+    	var totalWidth = canvasWidth-minX;
+    	if(totalWidth > canvasWidth*0.8){
+    		totalWidth = canvasWidth*0.8;
+    	}
+    	var avgWordWidth = Math.floor(totalWidth/wordsInLine);
 		var avgWordHeight = Math.floor(canvasHeight/wordsInLine);
 		var finalLength = Math.min(avgWordWidth,avgWordHeight);
 		HomeJs.wordWidth = finalLength;
@@ -1122,6 +1137,13 @@ var HomeJs = HomeJs || {
 
         HomeJs.firstPositionX = HomeJs.intCanvasWidth - 3 * HomeJs.wordWidth/2;
         HomeJs.firstPositionY = HomeJs.wordHeight/2;
+    },startDrawImageEvent:function(){
+    	 var oriContent = $("#content").val();
+         
+         var content = Util.filterString(oriContent);
+         var itemCnt = content.length;
+         HomeJs.calWordWidth(itemCnt);
+         HomeJs.btnDrawImageEvent();
     },btnDrawImageEvent:function(e){
         var oriContent = $("#content").val();
         
@@ -1131,8 +1153,7 @@ var HomeJs = HomeJs || {
         var itemCnt = content.length;
         
         HomeJs.clearImageDiv(HomeJs.canvasId);
-        HomeJs.calWordWidth(itemCnt);
-        //HomeJs.clearImageDiv(HomeJs.canvasId2);
+//        HomeJs.calWordWidth(itemCnt);
         if(itemCnt>0){
             $("#btnAddSpace").removeAttr("disabled");
             $("#btnMinusSpace").removeAttr("disabled");
@@ -1178,6 +1199,20 @@ var HomeJs = HomeJs || {
                 var wordMap = list[indexI];
                 HomeJs.createImage(id,fontType,wordMap,fixedSpace,fixHeight);
             }
+            setTimeout(function(){
+            	for(var indexI = 0;indexI<itemCnt;indexI++){
+                    var wordMap = list[indexI];
+                    var word = wordMap['word'];
+                    if(wordMap['type'] == "C"){
+                    	var imgDom = $("#word"+indexI)[0];
+                        HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
+                    }else{
+                    	var imgDom = $("#subWord"+indexI)[0];
+                        HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
+                    }
+                    
+                }
+            },500);
         }
     },btnPositionChangeEvent:function(init){
         var wordList = HomeJs.targetMap['wordList'];
@@ -1300,6 +1335,13 @@ var HomeJs = HomeJs || {
                 var wordMap = wordList[indexI];
                 HomeJs.createImage(HomeJs.canvasId3,bodyFontType,wordMap,fixedSpace,fixHeight);
             }
+            setTimeout(function(){
+            	for(var indexI = 0;indexI<wordCnt;indexI++){
+            		var wordMap = wordList[indexI];
+                    var imgDom = $("#word"+indexI)[0];
+                    HomeJs.capture(HomeJs.canvasId3,wordMap,imgDom,fixedSpace,fixHeight);
+                }
+            },500);
         }
         var subject = HomeJs.targetMap['subject'];
         itemCnt = subject.length;
@@ -1322,6 +1364,14 @@ var HomeJs = HomeJs || {
                 var word = wordMap['word'];
                 HomeJs.createImage(HomeJs.canvasId3,userFontType,wordMap,fixedSpace,fixHeight);
             }
+            setTimeout(function(){
+            	for(var indexI = 0;indexI<wordCnt;indexI++){
+            		var wordMap = subjectList[indexI];
+                    var imgDom = $("#subWord"+indexI)[0];
+                    HomeJs.capture(HomeJs.canvasId3,wordMap,imgDom,fixedSpace,fixHeight);
+                }
+            },500);
+            //HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
         }
     },clone:function(list){
         var newList = [];
