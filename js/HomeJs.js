@@ -14,7 +14,7 @@
  */
 //#endregion // ] Class comments
 
-var HomeJs = HomeJs || {
+var HomeJs = {
     canvasHeight:"1040px",
     canvasWidth:"760px",
     intCanvasHeight:1040,
@@ -47,6 +47,10 @@ var HomeJs = HomeJs || {
     tmpWordList:[],
     tmpSubjectList:[],
     currentIndex:0,
+    version:"v2",
+    asyncCount:0,
+    asyncCountAll:0,
+    showAnimationControl:false,
 	_initPage:function() {
         try {
 			//todo : 
@@ -199,11 +203,12 @@ var HomeJs = HomeJs || {
 
          selector = "#btnAddRowSpace";
         btnAddRowSpaceClick = function(e) {
-            // HomeJs.betweenWordWidth = HomeJs.betweenWordWidth + 1;
+             HomeJs.betweenWordWidth = HomeJs.betweenWordWidth + 5;
             // HomeJs.btnDrawImageEvent();
+        	var firstItemMap = HomeJs.targetMap.wordList[0];
             $.each(HomeJs.targetMap.wordList,function(index,wordMap){
                 if(wordMap['line'] > 1){
-                    wordMap['posX'] = wordMap['posX'] - 1;
+                    wordMap['posX'] = firstItemMap['posX'] - (wordMap['line'] - 1 ) * HomeJs.betweenWordWidth;//wordMap['posX'] - 1;
                 }
             });
             HomeJs.clearImageDiv(HomeJs.canvasId);
@@ -214,13 +219,14 @@ var HomeJs = HomeJs || {
 
         selector = "#btnMinusRowSpace";
         btnMinusRowSpaceClick = function(e) {
-            // if(HomeJs.betweenWordWidth > HomeJs.wordWidth){
-            //     HomeJs.betweenWordWidth = HomeJs.betweenWordWidth - 1;
+            if(HomeJs.betweenWordWidth > HomeJs.wordWidth){
+                 HomeJs.betweenWordWidth = HomeJs.betweenWordWidth - 5;
             //     HomeJs.btnDrawImageEvent();
-            // }           
+            }           
+            var firstItemMap = HomeJs.targetMap.wordList[0];
             $.each(HomeJs.targetMap.wordList,function(index,wordMap){
                 if(wordMap['line'] > 1){
-                    wordMap['posX'] = wordMap['posX'] + 1;
+                	wordMap['posX'] = firstItemMap['posX'] - (wordMap['line'] - 1 ) * HomeJs.betweenWordWidth;//wordMap['posX'] + 1;
                 }
             });
             HomeJs.clearImageDiv(HomeJs.canvasId);
@@ -568,9 +574,9 @@ var HomeJs = HomeJs || {
             if(HomeJs.targetMap['subjectList'] != undefined){
                 Util.bindDropDownList("targetSubWord",HomeJs.targetMap['subjectList'],'word','rowIndex',"請選擇");
                 $("#subjectModal").find("input:radio[name=moveType][value='ALL']")[0].checked=true;
-                $("#subjectModal").find("input:radio[name=moveType][value='ALL']").trigger("change");            
+                $("#subjectModal").find("input:radio[name=moveType][value='ALL']");//.trigger("change");            
             }
-            HomeJs.btnSubPositionChangeEvent(true);
+            HomeJs.btnSubPositionChangeEventInit();
 
 		};		        
         $(selector).unbind("show.bs.modal");
@@ -857,7 +863,7 @@ var HomeJs = HomeJs || {
             $("#formHeight").attr("disabled","disabled");
         }
         
-    },createImage:function(id,fontType,wordMap,fixedSpace,fixHeight){
+    },createImage:function(id,fontType,wordMap,fixedSpace,fixHeight,cb){
         if(fixedSpace == undefined){
             fixedSpace = false;
         }
@@ -879,14 +885,28 @@ var HomeJs = HomeJs || {
         $("#imageHideDiv")[0].append(imgDom);
         //imgDom.attr("style",'width:40px;height:40px');
         if(fontName != " "){
-            $(imgDom).attr("src","./font_data/"+fontType+"/"+fontName+".png");
-//            .on('load',function(){
-//                HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
-//            });
+            $(imgDom).attr("src","./font_data/"+fontType+"/"+fontName+".png")
+            .on('load',function(){
+//            	console.log(""+id+" ("+fontName+"):done!");
+            	HomeJs.asyncCount = HomeJs.asyncCount + 1;
+//            	console.log("HomeJs.asyncCount :"+HomeJs.asyncCount);
+//            	console.log("HomeJs.asyncCountAll :"+HomeJs.asyncCountAll);
+            	if(HomeJs.asyncCountAll == HomeJs.asyncCount){
+            		if(cb){
+            			cb();
+            		}
+            	}
+                //HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
+            });
+        } else{
+//        	console.log(""+id+" ("+fontName+"):done!");
+        	HomeJs.asyncCount = HomeJs.asyncCount + 1;
+        	if(HomeJs.asyncCountAll == HomeJs.asyncCount){
+        		if(cb){
+        			cb();
+        		}
+        	}
         }
-//        else{
-//            HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
-//        }
 	  	
         
         
@@ -915,6 +935,7 @@ var HomeJs = HomeJs || {
             fixHeight = false;
         }
         var canvas = $("#"+id)[0];
+        //console.log("id:"+JSON.stringify(wordMap));
 		//var canvas = document.createElement('canvas'); //建立canvas js DOM元素
         var rate = imageDom.height/imageDom.width;
 		//console.log("imageDom.width:"+imageDom.width);
@@ -925,12 +946,24 @@ var HomeJs = HomeJs || {
         
         if(fixedSpace){
             
-            if(!fixHeight){
-                if(rate > 1.0){
+            if(!fixHeight){//1.39 月 1.357
+                if(rate > 1.0){//避免心字變形
                     oriHeight = height;
                 }     
             }
         }else{
+        	if(rate > 1.3 && HomeJs.targetMap['bodyFontType'] != "草書" && wordMap['type'] == "C"){
+        		if(rate > 1.39){//TODO
+        			oriHeight = oriHeight * 0.63;
+            		width = width * 0.63;
+            		wordMap['width'] = width;
+        		}else{
+        			oriHeight = oriHeight * 0.7;
+            		width = width * 0.7;
+            		wordMap['width'] = width;
+        		}
+        		
+        	}
             wordMap['height'] = oriHeight;
             var indexI = wordMap['index'];
             var type = wordMap['type'];
@@ -952,7 +985,7 @@ var HomeJs = HomeJs || {
                     wordMap['height'] = oriHeight;
                 }
             }
-            console.log(wordMap['word']+".height:"+oriHeight+",index:"+indexI+",wordCnt:"+wordCnt);
+            //console.log(wordMap['word']+".height:"+oriHeight+",index:"+indexI+",wordCnt:"+wordCnt);
             if(indexI+1 < wordCnt && indexI >=0){
                 var diff = betweenWordHeight-wordHeight;
                 if(diff <= 20){
@@ -962,12 +995,13 @@ var HomeJs = HomeJs || {
                 //console.log(list[indexI]['word']+".posY:"+targetY+",index:"+indexI);
                 //console.log(list[indexI+1]['word']+".newPosY:"+newPosY+",index:"+indexI);
                 if( newPosY <= HomeJs.intCanvasHeight-wordHeight){
-                    list[indexI+1]['posY'] = newPosY;
-                    list[indexI+1]['posX'] = targetX;
+                        list[indexI+1]['posY'] = Math.floor(newPosY);
+                        list[indexI+1]['posX'] = Math.floor(targetX);
                 }else{
                     if(targetX - betweenWordWidth >= 0){
-                        list[indexI+1]['posX'] = targetX - betweenWordWidth;
-                        list[indexI+1]['posY']= firstPositionY;
+                            list[indexI+1]['posX'] = Math.floor(targetX - betweenWordWidth);
+                            list[indexI+1]['posY']= Math.floor(firstPositionY);
+                            //list[indexI+1]['line'] = wordMap['line'] + 1;
                     }else{
                         
                     }
@@ -1009,11 +1043,11 @@ var HomeJs = HomeJs || {
             wordList.push(wordMap);
             if(index+1<itemCnt){
                 if(posY+betweenWordHeight <= HomeJs.intCanvasHeight-HomeJs.wordHeight){
-                    posY = posY+betweenWordHeight;
+                    posY = Math.floor(posY+betweenWordHeight);
                 }else{
                     if(posX- betweenWordWidth >= 0){
-                        posX = posX- betweenWordWidth;
-                        posY = firstPositionY;
+                        posX = Math.floor(posX- betweenWordWidth);
+                        posY = Math.floor(firstPositionY);
                         line = line + 1;
                     }else{
                         break;
@@ -1098,8 +1132,8 @@ var HomeJs = HomeJs || {
     		HomeJs.wordHeight = 60;
     		HomeJs.betweenWordHeight = 80;
     		HomeJs.betweenWordWidth = 90;
-    		HomeJs.firstPositionX = HomeJs.intCanvasWidth - 3 * HomeJs.wordWidth/2;
-            HomeJs.firstPositionY = HomeJs.wordHeight/2;
+    		HomeJs.firstPositionX = Math.floor(HomeJs.intCanvasWidth - 3 * HomeJs.wordWidth/2);
+            HomeJs.firstPositionY = Math.floor(HomeJs.wordHeight/2);
     		return;
     	}
     	//HomeJs.wordWidth;
@@ -1108,15 +1142,34 @@ var HomeJs = HomeJs || {
     	var canvasWidth = HomeJs.intCanvasWidth;
     	var canvasHeight = HomeJs.intCanvasHeight;
     	var wordsInLine = 5;
+    	var poeticStyle = $("#poeticStyle").val();
     	if(totalWordCnt <= 20){
     		
     	}else if(totalWordCnt > 20 && totalWordCnt <= 28){
-    		wordsInLine = 7;
+    		if(poeticStyle == "五言絕句"){
+    			wordsInLine = 5;
+    		}else{
+    			wordsInLine = 7;
+    		}
     		
+    		//poeticStyle 
+    		//七言絕句 28
+    		//五言絕句 25
     	}else if(totalWordCnt > 28 && totalWordCnt <= 50){
-    		line = 5;
+    		//poeticStyle
+    		//五言律詩
+    		if(poeticStyle == "五言律詩"){
+    			line = 8;
+    		}else{
+    			line = 5;
+    		}
+    		
     		wordsInLine = Math.ceil(totalWordCnt/line);
     	}else{//>50
+    		//poeticStyle
+    		//七言律詩
+    		//五言古詩
+    		//
     		line = 8;
     		wordsInLine = Math.ceil(totalWordCnt/line);
     	}
@@ -1126,23 +1179,44 @@ var HomeJs = HomeJs || {
     	if(totalWidth > canvasWidth*0.8){
     		totalWidth = canvasWidth*0.8;
     	}
-    	var avgWordWidth = Math.floor(totalWidth/wordsInLine);
-		var avgWordHeight = Math.floor(canvasHeight/wordsInLine);
-		var finalLength = Math.min(avgWordWidth,avgWordHeight);
-		HomeJs.wordWidth = finalLength;
-		HomeJs.wordHeight = finalLength;
-		HomeJs.betweenWordHeight = finalLength + 20;
-		HomeJs.betweenWordWidth = finalLength + 10;
-		
+    	if(HomeJs.version == "v1"){
+    		var avgWordWidth = Math.floor(totalWidth/line);
+    		var avgWordHeight = Math.floor(canvasHeight/wordsInLine);
+    		var finalLength = Math.min(avgWordWidth,avgWordHeight);
+    		//var wordLength = Math.min(avgWordWidth,avgWordHeight);
+    		HomeJs.wordWidth = finalLength;
+    		HomeJs.wordHeight = finalLength;
+    		HomeJs.betweenWordHeight = finalLength + 20;
+    		HomeJs.betweenWordWidth = finalLength + 10;
+    		
 
-        HomeJs.firstPositionX = HomeJs.intCanvasWidth - 3 * HomeJs.wordWidth/2;
-        HomeJs.firstPositionY = HomeJs.wordHeight/2;
+            HomeJs.firstPositionX = Math.floor(HomeJs.intCanvasWidth - 3 * HomeJs.wordWidth/2);
+            HomeJs.firstPositionY = Math.floor(HomeJs.wordHeight/2);
+    	}else if(HomeJs.version == "v2"){
+    		var avgWordWidth = Math.floor(totalWidth/(line+0.5));
+    		var avgWordHeight = Math.floor(canvasHeight/(wordsInLine+1));
+    		var finalLength = avgWordHeight;//Math.min(avgWordWidth,avgWordHeight);
+    		var wordLength = Math.min(avgWordWidth,avgWordHeight);
+    		HomeJs.wordWidth = wordLength;
+    		HomeJs.wordHeight = wordLength;
+    		HomeJs.betweenWordHeight = finalLength;
+    		HomeJs.betweenWordWidth = wordLength;
+    		
+
+            HomeJs.firstPositionX = Math.floor(HomeJs.intCanvasWidth - 3 * HomeJs.wordWidth/2);
+            HomeJs.firstPositionY = Math.floor(HomeJs.wordHeight/2);
+    	}
+    	
     },startDrawImageEvent:function(){
     	 var oriContent = $("#content").val();
          
          var content = Util.filterString(oriContent);
          var itemCnt = content.length;
-         HomeJs.calWordWidth(itemCnt);
+         var bodyFontType = $("#bodyFontType").val();
+         if(true || bodyFontType == "草書"){
+        	 HomeJs.calWordWidth(itemCnt);
+         }
+         
          HomeJs.btnDrawImageEvent();
     },btnDrawImageEvent:function(e){
         var oriContent = $("#content").val();
@@ -1175,7 +1249,7 @@ var HomeJs = HomeJs || {
             $("#btnPositionChange").attr("disabled","disabled"); 
             $("#btnEditSubject").attr("disabled","disabled");       
         }
-    },drawContentImage:function(init){
+    },drawContentImage:function(init,cb){
         var wordList = HomeJs.targetMap['wordList'];
         var bodyFontType = $("#bodyFont").val();
         //var fixHeight = $("#fixWordHeight")[0].checked;
@@ -1190,29 +1264,35 @@ var HomeJs = HomeJs || {
         }    
         HomeJs.targetMap['bodyFontType'] = bodyFontType;
         HomeJs.targetMap['fixedSpace'] = $("#fixWordHeight")[0].checked;
-        HomeJs.drawImageEvent(HomeJs.canvasId,wordList,bodyFontType,fixedSpace,fixHeight); 
-    },drawImageEvent:function(id,list,fontType,fixedSpace,fixHeight){
+        HomeJs.drawImageEvent(HomeJs.canvasId,wordList,bodyFontType,fixedSpace,fixHeight,cb); 
+    },drawImageEvent:function(id,list,fontType,fixedSpace,fixHeight,cb){
         //HomeJs.clearImageDiv(id);
         var itemCnt = list.length;
         if(itemCnt>0){
+        	HomeJs.asyncCountAll = itemCnt;
+        	HomeJs.asyncCount = 0;
             for(var indexI = 0;indexI<itemCnt;indexI++){
                 var wordMap = list[indexI];
-                HomeJs.createImage(id,fontType,wordMap,fixedSpace,fixHeight);
+                HomeJs.createImage(id,fontType,wordMap,fixedSpace,fixHeight,function(){
+                	console.log("start capture!");
+                	for(var indexJ = 0;indexJ<itemCnt;indexJ++){
+		                  var wordMap = list[indexJ];
+		                  //var word = wordMap['word'];
+		                  if(wordMap['type'] == "C"){
+		                  	var imgDom = $("#word"+indexJ)[0];
+		                      HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
+		                  }else{
+		                  	var imgDom = $("#subWord"+indexJ)[0];
+		                      HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
+		                  }
+		                  
+		              }               	
+                	  console.log("end capture!");
+                	  if(cb){
+                		  cb();
+                	  }
+                });
             }
-            setTimeout(function(){
-            	for(var indexI = 0;indexI<itemCnt;indexI++){
-                    var wordMap = list[indexI];
-                    var word = wordMap['word'];
-                    if(wordMap['type'] == "C"){
-                    	var imgDom = $("#word"+indexI)[0];
-                        HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
-                    }else{
-                    	var imgDom = $("#subWord"+indexI)[0];
-                        HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
-                    }
-                    
-                }
-            },500);
         }
     },btnPositionChangeEvent:function(init){
         var wordList = HomeJs.targetMap['wordList'];
@@ -1235,38 +1315,42 @@ var HomeJs = HomeJs || {
         HomeJs.drawImageEvent(HomeJs.canvasId2,wordList,bodyFontType,fixedSpace,fixHeight); 
     },drawSubjectImage:function(){
         HomeJs.clearImageDiv(HomeJs.canvasId);
-        HomeJs.drawContentImage(false);
-        var wordList = HomeJs.targetMap['subjectList'];
-        var subjectFontType = $("#userFont").val();
-        var fixedSpace = true;
-        HomeJs.targetMap['subjectFontType'] = subjectFontType;
-        HomeJs.drawImageEvent(HomeJs.canvasId,wordList,subjectFontType,fixedSpace,true); 
-    },btnDrawSubjectEvent:function(e){
-        HomeJs.clearImageDiv(HomeJs.canvasId);
-        HomeJs.drawContentImage(false);
-        var oriSubject = $("#subject").val();
-        //var targetMap = HomeJs.targetList[HomeJs.currentIndex];
-
-        HomeJs.targetMap['oriSubject'] = oriSubject;
-        var subject = Util.filterSubjectString(oriSubject);
-       HomeJs.targetMap['subject'] = subject;
-        var wordList = [];
-        var itemCnt = subject.length;
-        //HomeJs.clearImageDiv(HomeJs.canvasId);
-        //HomeJs.clearImageDiv(HomeJs.canvasId2);
-        if(itemCnt>0){
-            $("#btnEditSubject").removeAttr("disabled");
-            //HomeJs.subPositionY = HomeJs.intCanvasHeight/2 - (itemCnt * HomeJs.wordHeight)/2;
-            $("#btnAddSpace").removeAttr("disabled");
-            $("#btnMinusSpace").removeAttr("disabled");
-            $("#btnPositionChange").removeAttr("disabled");
-            wordList = HomeJs.buildSubjectList(subject,true);
-            HomeJs.targetMap['subjectList'] = wordList;
-            var bodyFontType = $("#userFont").val();
-            HomeJs.targetMap['subjectFontType'] = bodyFontType;
-            HomeJs.drawImageEvent(HomeJs.canvasId,wordList,bodyFontType,false,false); 
+        HomeJs.drawContentImage(false,function(){
+        	var wordList = HomeJs.targetMap['subjectList'];
+            var subjectFontType = $("#userFont").val();
+            var fixedSpace = true;
+            HomeJs.targetMap['subjectFontType'] = subjectFontType;
+            HomeJs.drawImageEvent(HomeJs.canvasId,wordList,subjectFontType,fixedSpace,true); 
+        });
         
-        }
+    },btnDrawSubjectEvent: function(e){
+        HomeJs.clearImageDiv(HomeJs.canvasId);
+        HomeJs.drawContentImage(false,function(){
+            var oriSubject = $("#subject").val();
+            //var targetMap = HomeJs.targetList[HomeJs.currentIndex];
+
+            HomeJs.targetMap['oriSubject'] = oriSubject;
+            var subject = Util.filterSubjectString(oriSubject);
+            HomeJs.targetMap['subject'] = subject;
+            var wordList = [];
+            var itemCnt = subject.length;
+            //HomeJs.clearImageDiv(HomeJs.canvasId);
+            //HomeJs.clearImageDiv(HomeJs.canvasId2);
+            if(itemCnt>0){
+                $("#btnEditSubject").removeAttr("disabled");
+                //HomeJs.subPositionY = HomeJs.intCanvasHeight/2 - (itemCnt * HomeJs.wordHeight)/2;
+                $("#btnAddSpace").removeAttr("disabled");
+                $("#btnMinusSpace").removeAttr("disabled");
+                $("#btnPositionChange").removeAttr("disabled");
+                wordList = HomeJs.buildSubjectList(subject,true);
+                HomeJs.targetMap['subjectList'] = wordList;
+                var bodyFontType = $("#userFont").val();
+                HomeJs.targetMap['subjectFontType'] = bodyFontType;
+                HomeJs.drawImageEvent(HomeJs.canvasId,wordList,bodyFontType,false,false); 
+            
+            }
+        });
+
     },buildSubjectList:function(content,bFinal){
         var wordList = [];
         var firstPositionX = HomeJs.subPositionX;
@@ -1300,15 +1384,15 @@ var HomeJs = HomeJs || {
             if(index+1<itemCnt){
                 if(posY+betweenWordHeight <= HomeJs.intCanvasHeight-HomeJs.subWordHeight){
                     if(word == " "){
-                        posY = posY + betweenWordHeight/2;  
+                        posY = Math.floor(posY + betweenWordHeight/2);  
                     }else{
-                        posY = posY + betweenWordHeight;    
+                        posY = Math.floor(posY + betweenWordHeight);    
                     }
                     
                 }else{
                     if(posX + betweenWordWidth >= 0){
-                        posX = posX - betweenWordWidth;
-                        posY = firstPositionY;
+                        posX = Math.floor(posX - betweenWordWidth);
+                        posY = Math.floor(firstPositionY);
                         line = line + 1;
                     }else{
                         break;
@@ -1318,6 +1402,7 @@ var HomeJs = HomeJs || {
         }
         return wordList;
     },btnSubPositionChangeEvent:function(init){
+    	console.log("start btnSubPositionChangeEvent");
         HomeJs.clearImageDiv(HomeJs.canvasId3);
         var content = HomeJs.targetMap['content'];
         var itemCnt = content.length;
@@ -1331,48 +1416,129 @@ var HomeJs = HomeJs || {
             if($("#fixWordHeight")[0].checked){
                 fixHeight = false;
             }
+        	HomeJs.asyncCountAll = wordCnt;
+        	HomeJs.asyncCount = 0;
+        	
             for(var indexI = 0;indexI<wordCnt;indexI++){
                 var wordMap = wordList[indexI];
-                HomeJs.createImage(HomeJs.canvasId3,bodyFontType,wordMap,fixedSpace,fixHeight);
+                HomeJs.createImage(HomeJs.canvasId3,bodyFontType,wordMap,fixedSpace,fixHeight,function(){
+                	wordList = HomeJs.targetMap['wordList'];
+                	wordCnt = HomeJs.targetMap['wordList'].length;
+                	var fixedSpace = true;
+                    var fixHeight = true;
+                    if($("#fixWordHeight")[0].checked){
+                        fixHeight = false;
+                    }
+                	for(var indexJ = 0;indexJ<wordCnt;indexJ++){
+                		var wordMap = wordList[indexJ];
+                        var imgDom = $("#word"+indexJ)[0];
+                        HomeJs.capture(HomeJs.canvasId3,wordMap,imgDom,fixedSpace,fixHeight);
+                    } 
+                	
+                	var subject = HomeJs.targetMap['subject'];
+                    itemCnt = subject.length;
+                    
+                    if(itemCnt>0){
+                    	var subjectList = HomeJs.targetMap['subjectList'];
+                        
+                        var fixedSpace = true;
+                        var fixHeight = true;
+                        subjectList = HomeJs.tmpSubjectList;
+                        
+                        var subWordCnt = subjectList.length;
+                        var userFontType = $("#userFont").val(); 
+                        HomeJs.asyncCountAll = subWordCnt;
+                    	HomeJs.asyncCount = 0;
+                        HomeJs.targetMap['subjectFontType'] = userFontType; 
+                        for(var indexI = 0;indexI<subWordCnt;indexI++){
+                            var wordMap = subjectList[indexI];
+                            var word = wordMap['word'];
+                            HomeJs.createImage(HomeJs.canvasId3,userFontType,wordMap,fixedSpace,fixHeight,function(){
+                            	var fixedSpace = true;
+                                var fixHeight = true;
+                                
+                            	for(var indexJ= 0;indexJ<subWordCnt;indexJ++){
+                            		var wordMap = subjectList[indexJ];
+                                    var imgDom = $("#subWord"+indexJ)[0];
+                                    HomeJs.capture(HomeJs.canvasId3,wordMap,imgDom,fixedSpace,fixHeight);
+                                }
+                            });
+                        }
+                        //HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
+                    }
+                });
             }
-            setTimeout(function(){
-            	for(var indexI = 0;indexI<wordCnt;indexI++){
-            		var wordMap = wordList[indexI];
-                    var imgDom = $("#word"+indexI)[0];
-                    HomeJs.capture(HomeJs.canvasId3,wordMap,imgDom,fixedSpace,fixHeight);
-                }
-            },500);
         }
-        var subject = HomeJs.targetMap['subject'];
-        itemCnt = subject.length;
+        
+    },btnSubPositionChangeEventInit:function(){
+    	console.log("start btnSubPositionChangeEventInit");
+        HomeJs.clearImageDiv(HomeJs.canvasId3);
+        var content = HomeJs.targetMap['content'];
+        var itemCnt = content.length;
         if(itemCnt>0){
-            var subjectList = HomeJs.targetMap['subjectList'];
+            var wordList = HomeJs.targetMap['wordList'];
+            var wordCnt = wordList.length;
+            var bodyFontType = $("#bodyFont").val();
+            //var fixedSpace = $("#fixWordHeight")[0].checked;
             var fixedSpace = true;
             var fixHeight = true;
-            if(init){
-                HomeJs.tmpSubjectList = HomeJs.clone(subjectList);
-                fixedSpace = false;
-            }else{
-                subjectList = HomeJs.tmpSubjectList;
-                //fixHeight = true;
+            if($("#fixWordHeight")[0].checked){
+                fixHeight = false;
             }
-            var wordCnt = subjectList.length;
-            var userFontType = $("#userFont").val();  
-            HomeJs.targetMap['subjectFontType'] = userFontType; 
+        	HomeJs.asyncCountAll = wordCnt;
+        	HomeJs.asyncCount = 0;
+        	
             for(var indexI = 0;indexI<wordCnt;indexI++){
-                var wordMap = subjectList[indexI];
-                var word = wordMap['word'];
-                HomeJs.createImage(HomeJs.canvasId3,userFontType,wordMap,fixedSpace,fixHeight);
+                var wordMap = wordList[indexI];
+                HomeJs.createImage(HomeJs.canvasId3,bodyFontType,wordMap,fixedSpace,fixHeight,function(){
+                	wordList = HomeJs.targetMap['wordList'];
+                	wordCnt = HomeJs.targetMap['wordList'].length;
+                	var fixedSpace = true;
+                    var fixHeight = true;
+                    if($("#fixWordHeight")[0].checked){
+                        fixHeight = false;
+                    }
+                	for(var indexJ = 0;indexJ<wordCnt;indexJ++){
+                		var wordMap = wordList[indexJ];
+                        var imgDom = $("#word"+indexJ)[0];
+                        HomeJs.capture(HomeJs.canvasId3,wordMap,imgDom,fixedSpace,fixHeight);
+                    } 
+                	var subject = HomeJs.targetMap['subject'];
+                    itemCnt = subject.length;
+                    
+                	
+                    if(itemCnt>0){
+                        
+                        var fixedSpace = true;
+                        var fixHeight = true;
+                        var subjectList = HomeJs.targetMap['subjectList'];
+                        HomeJs.tmpSubjectList = HomeJs.clone(subjectList);
+                        fixedSpace = false;
+                        var subWordCnt = subjectList.length;
+                        var userFontType = $("#userFont").val(); 
+                        HomeJs.asyncCountAll = subWordCnt;
+                    	HomeJs.asyncCount = 0;
+                        HomeJs.targetMap['subjectFontType'] = userFontType; 
+                        for(var indexI = 0;indexI<subWordCnt;indexI++){
+                            var wordMap = subjectList[indexI];
+                            var word = wordMap['word'];
+                            HomeJs.createImage(HomeJs.canvasId3,userFontType,wordMap,fixedSpace,fixHeight,function(){
+                            	var fixedSpace = false;
+                                var fixHeight = true;
+                               
+                            	for(var indexJ= 0;indexJ<subWordCnt;indexJ++){
+                            		var wordMap = subjectList[indexJ];
+                                    var imgDom = $("#subWord"+indexJ)[0];
+                                    HomeJs.capture(HomeJs.canvasId3,wordMap,imgDom,fixedSpace,fixHeight);
+                                }
+                            });
+                        }
+                        //HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
+                    }
+                });
             }
-            setTimeout(function(){
-            	for(var indexI = 0;indexI<wordCnt;indexI++){
-            		var wordMap = subjectList[indexI];
-                    var imgDom = $("#subWord"+indexI)[0];
-                    HomeJs.capture(HomeJs.canvasId3,wordMap,imgDom,fixedSpace,fixHeight);
-                }
-            },500);
-            //HomeJs.capture(id,wordMap,imgDom,fixedSpace,fixHeight);
         }
+        
     },clone:function(list){
         var newList = [];
         if(list == undefined) return newList;
