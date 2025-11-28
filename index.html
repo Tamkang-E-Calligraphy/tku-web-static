@@ -51,163 +51,169 @@ function _initPage() {
 <body>
 <div class="container-fluid">
     <div class="row">
-        <!-- 左側輸入區 -->
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="row">
-                    <div class="col-12 d-flex justify-content-center">
-                        <h5>本文</h5>
-                    </div>                    
-                </div>                
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-12 d-flex justify-content-center">
-                            <label>輸入佈局文字</label>
-                        </div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-12 d-flex justify-content-center">
-                            <input type="button" class="btn btn-sm btn-primary" value="唐詩三百首" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#addModalCenter" >
-                        </div>                    
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <textarea class="form-control" rows="4" id="content">依圖中文字樣</textarea>
-                        </div>
-                        
-                    </div>
-                    <div class="row" hidden id="imageHideDiv">
-
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-12 d-flex justify-content-center">
-                            <label>選擇規格</label>
-                        </div>                    
-                    </div>
-                    <div class="row mb-1">
-                        <div class="col-12 d-flex justify-content-center">
-                           <select class="form-control" style="text-align: center;" name="bodyFont" id="bodyFont">
-                                <option value="楷書">楷書</option>
-                                <option value="標草書">標草書</option>
-                                <option value="篆書">篆書</option>
-                                <option value="草書">草書</option>
-                                <option value="行書">行書</option>
-                                <option value="隸書">隸書</option>
-                            </select>
-                        </div>                    
-                    </div>
-                    <div class="row">
-                        <div class="col-12 d-flex justify-content-center">
-                            <div class="form-check form-check-inline">
-                                <input type="checkbox" name="fixWordHeight" id="fixWordHeight" value="Y" class="form-check-input">
-                                <label class="form-check-label">固定間距</label>
-                            </div>
-                           
-                        </div>                    
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-12 d-flex justify-content-center">
-                            <label>選擇畫布尺寸</label>
-                        </div>                    
-                    </div>
-                    <div class="row mb-1">
-                        <div class="col-12 d-flex justify-content-center">
-                            <div class="form-check form-check-inline">
-                                <input type="radio" name="size" value="B1" class="form-check-input" checked>
-                                <label class="form-check-label">全開</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" name="size" value="B2" class="form-check-input">
-                                <label class="form-check-label">對開</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" name="size" value="SQ" class="form-check-input">
-                                <label class="form-check-label">斗方</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" name="size" value="CU" class="form-check-input">
-                                <label class="form-check-label">自訂</label>
-                            </div>
-                        </div>                    
-                    </div>
-                    <div class="row">
-                        <div class="col-12 d-flex justify-content-center">
-                            <div class="form-check-inline">
-                                <input type="text" disabled="disabled" onkeypress="return event.charCode >= 48 && event.charCode <= 57" class="form-control" placeholder="畫布寬度(公厘)" name="formWeight" id="formWeight"> 
-                                <input type="text" disabled="disabled" onkeypress="return event.charCode >= 48 && event.charCode <= 57" class="form-control" placeholder="畫布高度(公厘)" name="formHeight" id="formHeight"> 
-
-                            </div> 
-                        </div>                    
-                    </div>                    
-                </div>
-                <hr>
-                <div class="row">
-                    <div class="col-12 d-flex justify-content-center">
-                        <h5>落款</h5>
-                    </div>                    
-                </div>
-                
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-12 d-flex justify-content-center">
-                            <label>落款字體規格</label>
-                        </div>                    
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-12 d-flex justify-content-center">
-                            <select class="form-control" style="text-align: center;" name="userFont" id="userFont">
-                                <option value="楷書">楷書</option>
-                                <option value="標草書">標草書</option>
-                                <option value="篆書">篆書</option>
-                                <option value="草書">草書</option>
-                                <option value="行書">行書</option>
-                                <option value="隸書">隸書</option>
-                            </select>
-                        </div>                    
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-12 d-flex justify-content-center">
-                            <label>輸入落款文字</label>
-                        </div>                    
-                    </div>
-                    
-                    <textarea class="form-control" placeholder="輸入落款文字" rows="2" id="subject"></textarea>
-                </div>
-                <div class="row">
-                    <div class="col-12 d-flex justify-content-around">
-                        <input type="button" class="btn btn-sm btn-primary" value="加入落款" id="btnAddSubject">
-                        <input type="button" class="btn btn-sm btn-secondary" value="修改落款" id="btnEditSubject" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#subjectModalCenter">
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-
-        <!-- 中間功能按鈕區 -->
-        <div class="col-md-2 mb-3">
-            <input type="button" class="btn btn-light btn-block" id="btnDrawImage" value="開始本文佈局">
-            <input type="button" class="btn btn-light btn-block" id="btnAddSpace" value="本文上下字距加寬">
-            <input type="button" class="btn btn-light btn-block" id="btnMinusSpace" value="本文上下字距變窄">
-            <input type="button" class="btn btn-light btn-block" id="btnAddRowSpace" value="本文行距加寬">
-            <input type="button" class="btn btn-light btn-block" id="btnMinusRowSpace" value="本文行距變窄">
-            <input type="button" class="btn btn-light btn-block" id="btnPositionChange" value="修改本文位置" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#contentModalCenter">
-            <input type="button" class="btn btn-light btn-block" id="btnAddOne" value="新開一張">
-            <input type="button" class="btn btn-light btn-block" id="btnPrev" value="前一張">
-            <input type="button" class="btn btn-light btn-block" id="btnNext" value="下一張">
-            <input type="button" class="btn btn-light btn-block" id="btnSavePicture" value="儲存圖片">
-            <input type="button" class="btn btn-light btn-block" value="生成動畫">
-            <input type="button" class="btn btn-light btn-block" hidden value="結束程式">
-        </div>
+    	<div class="col-md-4 mb-3">
+    		<div class="row">
+    		<!-- 左側輸入區 -->
+		        <div class="col-md-8 mb-3">
+		            <div class="card">
+		                <div class="row">
+		                    <div class="col-12 d-flex justify-content-center">
+		                        <h5>本文</h5>
+		                    </div>                    
+		                </div>                
+		                <div class="form-group">
+		                    <div class="row">
+		                        <div class="col-12 d-flex justify-content-center">
+		                            <label>輸入佈局文字</label>
+		                        </div>
+		                    </div>
+		                    <div class="row mb-2">
+		                        <div class="col-12 d-flex justify-content-center">
+		                            <input type="button" class="btn btn-sm btn-primary" value="唐詩三百首" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#addModalCenter" >
+		                        </div>                    
+		                    </div>
+		                    <div class="row">
+		                        <div class="col-12">
+		                            <textarea class="form-control" rows="4" id="content">依圖中文字樣</textarea>
+		                        </div>
+		                        
+		                    </div>
+		                    <div class="row" hidden id="imageHideDiv">
+		
+		                    </div>
+		                </div>
+		                <div class="form-group">
+		                    <div class="row">
+		                        <div class="col-12 d-flex justify-content-center">
+		                            <label>選擇規格</label>
+		                        </div>                    
+		                    </div>
+		                    <div class="row mb-1">
+		                        <div class="col-12 d-flex justify-content-center">
+		                           <select class="form-control" style="text-align: center;" name="bodyFont" id="bodyFont">
+		                                <option value="楷書">楷書</option>
+		                                <option value="標草書">標草書</option>
+		                                <option value="篆書">篆書</option>
+		                                <option value="草書">草書</option>
+		                                <option value="行書">行書</option>
+		                                <option value="隸書">隸書</option>
+		                            </select>
+		                        </div>                    
+		                    </div>
+		                    <div class="row">
+		                        <div class="col-12 d-flex justify-content-center">
+		                            <div class="form-check form-check-inline">
+		                                <input type="checkbox" name="fixWordHeight" id="fixWordHeight" value="Y" class="form-check-input">
+		                                <label class="form-check-label">固定間距</label>
+		                            </div>
+		                           
+		                        </div>                    
+		                    </div>
+		                </div>
+		                <div class="form-group">
+		                    <div class="row">
+		                        <div class="col-12 d-flex justify-content-center">
+		                            <label>選擇畫布尺寸</label>
+		                        </div>                    
+		                    </div>
+		                    <div class="row mb-1">
+		                        <div class="col-12 d-flex justify-content-center">
+		                            <div class="form-check form-check-inline">
+		                                <input type="radio" name="size" value="B1" class="form-check-input" checked>
+		                                <label class="form-check-label">全開</label>
+		                            </div>
+		                            <div class="form-check form-check-inline">
+		                                <input type="radio" name="size" value="B2" class="form-check-input">
+		                                <label class="form-check-label">對開</label>
+		                            </div>
+		                            <div class="form-check form-check-inline">
+		                                <input type="radio" name="size" value="SQ" class="form-check-input">
+		                                <label class="form-check-label">斗方</label>
+		                            </div>
+		                            <div class="form-check form-check-inline">
+		                                <input type="radio" name="size" value="CU" class="form-check-input">
+		                                <label class="form-check-label">自訂</label>
+		                            </div>
+		                        </div>                    
+		                    </div>
+		                    <div class="row">
+		                        <div class="col-12 d-flex justify-content-center">
+		                        		<label for="formWeight" class="form-check-label">畫布寬度</label>
+		                                <input type="number" disabled="disabled" onkeypress="return event.charCode >= 48 && event.charCode <= 57" class="" placeholder="畫布寬度(公厘)" name="formWeight" id="formWeight">  
+		                        </div>
+		                        <div class="col-12 d-flex justify-content-center">
+		                               <label for="formHeight" class="form-check-label">畫布高度</label>
+		                               <input type="number" disabled="disabled" onkeypress="return event.charCode >= 48 && event.charCode <= 57" class="" placeholder="畫布高度(公厘)" name="formHeight" id="formHeight"> 
+		                        </div>                    
+		                    </div>                    
+		                </div>
+		                <hr>
+		                <div class="row">
+		                    <div class="col-12 d-flex justify-content-center">
+		                        <h5>落款</h5>
+		                    </div>                    
+		                </div>
+		                
+		                <div class="form-group">
+		                    <div class="row">
+		                        <div class="col-12 d-flex justify-content-center">
+		                            <label>落款字體規格</label>
+		                        </div>                    
+		                    </div>
+		                    <div class="row mb-2">
+		                        <div class="col-12 d-flex justify-content-center">
+		                            <select class="form-control" style="text-align: center;" name="userFont" id="userFont">
+		                                <option value="楷書">楷書</option>
+		                                <option value="標草書">標草書</option>
+		                                <option value="篆書">篆書</option>
+		                                <option value="草書">草書</option>
+		                                <option value="行書">行書</option>
+		                                <option value="隸書">隸書</option>
+		                            </select>
+		                        </div>                    
+		                    </div>
+		                    
+		                    <div class="row">
+		                        <div class="col-12 d-flex justify-content-center">
+		                            <label>輸入落款文字</label>
+		                        </div>                    
+		                    </div>
+		                    
+		                    <textarea class="form-control" placeholder="輸入落款文字" rows="2" id="subject"></textarea>
+		                </div>
+		                <div class="row">
+		                    <div class="col-12 d-flex justify-content-around">
+		                        <input type="button" class="btn btn-sm btn-primary" value="加入落款" id="btnAddSubject">
+		                        <input type="button" class="btn btn-sm btn-secondary" value="修改落款" id="btnEditSubject" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#subjectModalCenter">
+		                    </div>
+		                </div>
+		                
+		            </div>
+		        </div>
+		
+		        <!-- 中間功能按鈕區 -->
+		        <div class="col-md-4 mb-3">
+		            <input type="button" class="btn btn-light btn-block" id="btnDrawImage" value="開始本文佈局">
+		            <input type="button" class="btn btn-light btn-block" id="btnAddSpace" value="本文上下字距加寬">
+		            <input type="button" class="btn btn-light btn-block" id="btnMinusSpace" value="本文上下字距變窄">
+		            <input type="button" class="btn btn-light btn-block" id="btnAddRowSpace" value="本文行距加寬">
+		            <input type="button" class="btn btn-light btn-block" id="btnMinusRowSpace" value="本文行距變窄">
+		            <input type="button" class="btn btn-light btn-block" id="btnPositionChange" value="修改本文位置" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#contentModalCenter">
+		            <input type="button" class="btn btn-light btn-block" id="btnAddOne" value="另開新幅">
+		            <input type="button" class="btn btn-light btn-block" id="btnPrev" value="前一張">
+		            <input type="button" class="btn btn-light btn-block" id="btnNext" value="下一張">
+		            <input type="button" class="btn btn-light btn-block" id="btnSavePicture" value="儲存圖片">
+		            <input type="button" class="btn btn-light btn-block" id="btnGenAniamtion" value="生成動畫" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#animationModalCenter">
+		            <input type="button" class="btn btn-light btn-block" hidden value="結束程式">
+		        </div>
+    		</div>
+    	</div>
+        
 
         <!-- 右側預覽區 -->
-        <div class="col-md-6 mb-3">
+        <div class="col-md-8 mb-3">
             <div>
-                <canvas id="previewCanvas" class="preview-area" height="1040px" width="760px" ></canvas>
+                <canvas id="previewCanvas" class="preview-area" style="border-color: red;" height="1040px" width="760px" ></canvas>
             </div>
         </div>
     </div>
