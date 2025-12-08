@@ -829,31 +829,36 @@ var HomeJs = {
     },setCanvasPanel:function(sHeight,sWidth){
         HomeJs.canvasHeight = sHeight;
         HomeJs.canvasWidth = sWidth;
+        
+        var tmpWidth = sWidth.replace("px","");
+        var tmpHeight = sHeight.replace("px","");
+        HomeJs.intCanvasHeight = parseInt(tmpHeight);
+        HomeJs.intCanvasWidth = parseInt(tmpWidth);
+        $("#formWeight").val(tmpWidth);
+        $("#formHeight").val(tmpHeight);
+       //HomeJs.setCanvasSize();
+    },setCanvasSize:function(){
         $("#"+HomeJs.canvasId).attr("height",HomeJs.canvasHeight);
         $("#"+HomeJs.canvasId).attr("width",HomeJs.canvasWidth);
         $("#"+HomeJs.canvasId2).attr("height",HomeJs.canvasHeight);
         $("#"+HomeJs.canvasId2).attr("width",HomeJs.canvasWidth);
         $("#"+HomeJs.canvasId3).attr("height",HomeJs.canvasHeight);
         $("#"+HomeJs.canvasId3).attr("width",HomeJs.canvasWidth);
-       HomeJs.setCanvasSize();
-    },setCanvasSize:function(){
-        sWidth = HomeJs.canvasWidth.replace("px","");
-        sHeight = HomeJs.canvasHeight.replace("px","");
-        HomeJs.intCanvasHeight = parseInt(sHeight);
-        HomeJs.intCanvasWidth = parseInt(sWidth);
-        HomeJs.firstPositionX = sWidth - 3 * HomeJs.wordWidth/2;
+        var nWidth = HomeJs.intCanvasWidth;
+        var nHeight = HomeJs.intCanvasHeight;
+         
+        HomeJs.firstPositionX = nWidth - 3 * HomeJs.wordWidth/2;
         HomeJs.firstPositionY = HomeJs.wordHeight/2;
-        HomeJs.subPositionX = Math.floor(1 * HomeJs.wordWidth/2);
+        HomeJs.subPositionX = Math.floor(1 * HomeJs.subWordWidth/2);
         HomeJs.subPositionY = Math.floor(HomeJs.intCanvasHeight/3);
         //HomeJs.betweenWordHeight =  HomeJs.wordHeight,
         //HomeJs.betweenWordWidth = HomeJs.wordWidth,
-        $("#formWeight").val(sWidth);
-        $("#formHeight").val(sHeight);
-        if(HomeJs.targetMap['subjectList'] != undefined){
-            HomeJs.btnDrawSubjectEvent();
-        }else if(HomeJs.targetMap['wordList'] != undefined){
-            HomeJs.btnDrawImageEvent();
-        }
+        
+        // if(HomeJs.targetMap['subjectList'] != undefined){
+        //     HomeJs.btnDrawSubjectEvent();
+        // }else if(HomeJs.targetMap['wordList'] != undefined){
+        //     HomeJs.btnDrawImageEvent();
+        // }
     },setCanvasEabled:function(bEabled){
         if(bEabled){
             $("#formWeight").removeAttr("disabled");
@@ -956,15 +961,15 @@ var HomeJs = {
         		if(rate > 1.39){//TODO
         			oriHeight = oriHeight * 0.63;
             		width = width * 0.63;
-            		wordMap['width'] = width;
+            		wordMap['width'] = Math.floor(width);
         		}else{
         			oriHeight = oriHeight * 0.7;
             		width = width * 0.7;
-            		wordMap['width'] = width;
+            		wordMap['width'] = Math.floor(width);
         		}
         		
         	}
-            wordMap['height'] = oriHeight;
+            wordMap['height'] = Math.floor(oriHeight);
             var indexI = wordMap['index'];
             var type = wordMap['type'];
             var list = HomeJs.targetMap['wordList'];
@@ -1001,8 +1006,8 @@ var HomeJs = {
                     if(targetX - betweenWordWidth >= 0){
                             list[indexI+1]['posX'] = Math.floor(targetX - betweenWordWidth);
                             list[indexI+1]['posY']= Math.floor(firstPositionY);
-                            //list[indexI+1]['line'] = wordMap['line'] + 1;
-                    }else{
+                            list[indexI+1]['line'] = wordMap['line'] + 1;
+                        }else{
                         
                     }
                 }
@@ -1134,6 +1139,10 @@ var HomeJs = {
     		HomeJs.betweenWordWidth = 90;
     		HomeJs.firstPositionX = Math.floor(HomeJs.intCanvasWidth - 3 * HomeJs.wordWidth/2);
             HomeJs.firstPositionY = Math.floor(HomeJs.wordHeight/2);
+            HomeJs.subWordWidth = 60;
+    		HomeJs.subWordHeight = 60;
+    		HomeJs.betweenSubWordHeight = 80;
+    		HomeJs.betweenSubWordWidth = 90;
     		return;
     	}
     	//HomeJs.wordWidth;
@@ -1159,7 +1168,7 @@ var HomeJs = {
     		//poeticStyle
     		//五言律詩
     		if(poeticStyle == "五言律詩"){
-    			line = 8;
+                line = 7;
     		}else{
     			line = 5;
     		}
@@ -1176,7 +1185,9 @@ var HomeJs = {
     	
     	var minX = HomeJs.subPositionX + HomeJs.subWordWidth + 10;
     	var totalWidth = canvasWidth-minX;
-    	if(totalWidth > canvasWidth*0.8){
+    	if(totalWidth > canvasWidth*0.9 && poeticStyle != "五言絕句"){
+    		totalWidth = canvasWidth*0.9;
+    	}else if(totalWidth > canvasWidth*0.8 && poeticStyle == "五言絕句"){
     		totalWidth = canvasWidth*0.8;
     	}
     	if(HomeJs.version == "v1"){
@@ -1194,14 +1205,26 @@ var HomeJs = {
             HomeJs.firstPositionY = Math.floor(HomeJs.wordHeight/2);
     	}else if(HomeJs.version == "v2"){
     		var avgWordWidth = Math.floor(totalWidth/(line+0.5));
-    		var avgWordHeight = Math.floor(canvasHeight/(wordsInLine+1));
+    		var avgWordHeight = Math.floor(canvasHeight/(wordsInLine));
+            if(poeticStyle == "七言絕句" || poeticStyle == "五言絕句"){
+                avgWordHeight = Math.floor(canvasHeight/(wordsInLine+1));
+            }
     		var finalLength = avgWordHeight;//Math.min(avgWordWidth,avgWordHeight);
     		var wordLength = Math.min(avgWordWidth,avgWordHeight);
     		HomeJs.wordWidth = wordLength;
     		HomeJs.wordHeight = wordLength;
-    		HomeJs.betweenWordHeight = finalLength;
-    		HomeJs.betweenWordWidth = wordLength;
     		
+            if(poeticStyle == "五言律詩" || poeticStyle == "七言律詩" ){
+                HomeJs.betweenWordHeight = wordLength + 20;
+    		    HomeJs.betweenWordWidth = wordLength + 20;
+            }else {
+                HomeJs.betweenWordHeight = finalLength;
+    		    HomeJs.betweenWordWidth = wordLength;
+            }
+    		HomeJs.subWordWidth = Math.floor(wordLength/2);
+            HomeJs.subWordHeight = Math.floor(wordLength/2);
+            //HomeJs.betweenSubWordHeight = Math.floor(wordLength/3 + 20);//80;
+    		HomeJs.betweenSubWordWidth = Math.floor(wordLength/2 + 30);//90;
 
             HomeJs.firstPositionX = Math.floor(HomeJs.intCanvasWidth - 3 * HomeJs.wordWidth/2);
             HomeJs.firstPositionY = Math.floor(HomeJs.wordHeight/2);
@@ -1215,6 +1238,7 @@ var HomeJs = {
          var bodyFontType = $("#bodyFontType").val();
          if(true || bodyFontType == "草書"){
         	 HomeJs.calWordWidth(itemCnt);
+             HomeJs.setCanvasSize();
          }
          
          HomeJs.btnDrawImageEvent();
